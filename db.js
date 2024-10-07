@@ -18,4 +18,15 @@ async function connectDB() {
     return connection;
 }
 
-export{connectDB};
+async function closeDB(connection) {
+    try {
+        if (connection) {
+            await connection.end;
+            console.log('Conexão encerrada com sucesso!');
+        }
+    } catch (err) {
+        console.error('Erro ao encerrar a conexão:', err.message);
+    }
+}
+
+export{connectDB, closeDB};

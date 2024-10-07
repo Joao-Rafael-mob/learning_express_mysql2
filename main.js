@@ -1,7 +1,7 @@
-const express = require('express')
+import express from 'express'
 const app = express()
 const port = 3000
-const a = require('./db.js')
+import {connectDB ,closeDB} from './db.js'
 
 app.get('/user', (req, res) => {
     res.send('Hello World!')
