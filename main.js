@@ -30,6 +30,29 @@ app.get('/user', async (req, res) => {
     }
 });
 
+app.get('/user/all', async (req, res) => {
+    const sql = `SELECT * FROM pessoas`;
+
+    let connection;
+    try {
+        connection = await connectDB();
+        const [result] = await connection.query(sql);
+
+        if (result.length === 0) {
+            await closeDB(connection);
+            return res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+
+        res.status(200).json(result);
+        await closeDB(connection);
+    } catch (err) {
+        console.error('Erro ao consultar dados:', err);
+        await closeDB(connection);
+        return res.status(500).json({ error: 'Erro ao consultar pessoa' });
+
+    }
+});
+
 app.post('/user', async (req, res) => {
     const { nome, idade, senha } = req.body;
     const sql = `INSERT INTO pessoas (nome, idade, senha) VALUES (?, ?, ?)`;

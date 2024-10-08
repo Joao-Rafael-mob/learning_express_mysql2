@@ -6,7 +6,7 @@ async function connectDB() {
             host: 'localhost',
             user: 'root',
             database: 'teste',
-            password: '2002'
+            password: '1234'
         });
         console.log('Conexão estabelecida com sucesso!');
         return connection;
@@ -27,8 +27,8 @@ async function closeDB(connection) {
         console.error('Erro ao encerrar a conexão:', err.message);
     }
 }
-// (async ()=>{
-//    let a = await connectDB();
-//    closeDB(a);
-// })()
+(async ()=>{
+   let a = await connectDB();
+   closeDB(a);
+})()
 export{connectDB, closeDB};
