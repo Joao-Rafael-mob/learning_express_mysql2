@@ -6,7 +6,7 @@ async function connectDB() {
             host: 'localhost',
             user: 'root',
             database: 'teste',
-            password: '1234'
+            password: '2002'
         });
         console.log('Conexão estabelecida com sucesso!');
         return connection;
