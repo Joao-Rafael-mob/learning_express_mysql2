@@ -1,15 +1,15 @@
-import { connectDB, closeDB } from "../../config/database.js";
+import User  from "../../config/dbUser.js";
 
 async function DELETE(req, res) {
   const { id } = req.params;
-  const sql = `DELETE FROM users WHERE id = ?`;
-  let connection;
 
   try {
-    connection = await connectDB();
-    const [result] = await connection.query(sql, [id]);
-
-    if (result.affectedRows === 0) {
+    const deleteUser = User.destroy({
+      where: {
+        id
+      }
+    });
+    if (deleteUser === null) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
@@ -17,8 +17,6 @@ async function DELETE(req, res) {
   } catch (err) {
     console.error("Erro ao deletar dados:", err);
     return res.status(500).json({ error: "Erro ao deletar pessoa" });
-  } finally {
-    await closeDB(connection);
-  }
+  } 
 }
 export { DELETE };

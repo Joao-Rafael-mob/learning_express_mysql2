@@ -1,30 +1,39 @@
-import { connectDB, closeDB } from "../../config/database.js";
 import bcrypt from "bcrypt";
+import  User  from "../../config/dbUser.js";
 
 async function POST(req, res) {
-  const { firstname, surname, email, password } = req.body;
-  const sql = `INSERT INTO users (firstname, surname, email, password) VALUES (?, ?, ?,?)`;
-  let connection;
-
+  const { firstname, surname, email, password, confirmPassword } = req.body;
   try {
+    if (!firstname || !surname || !email || !password || !confirmPassword) {
+      return res
+        .status(400)
+        .json({ error: "Todos os campos são obrigatórios" });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "As senhas não conferem" });
+    }
+
     const hashSenha = await bcrypt.hash(password, 10);
-    connection = await connectDB();
-    const [result] = await connection.query(sql, [
+
+    const user = await User.create({
       firstname,
       surname,
       email,
-      hashSenha
-    ]);
+      password: hashSenha
+    });
 
     res.status(201).json({
       message: "Cadastro realizado com sucesso",
-      id: result.insertId
+      id: user.id
     });
   } catch (err) {
     console.error("Erro ao inserir dados:", err);
+
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({ error: "O email já está em uso" });
+    }
+
     return res.status(500).json({ error: "Erro ao cadastrar pessoa" });
-  } finally {
-    await closeDB(connection);
   }
 }
 export { POST };
