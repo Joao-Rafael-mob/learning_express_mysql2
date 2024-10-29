@@ -1,6 +1,8 @@
 import prisma from "../../../prisma/db";
 import { Product } from "../../modals/ProductModal";
-import { saveImg } from "../../service/saveimg";
+import { handleCategory } from "./handlePost/handleCategory";
+import { handleImages } from "./handlePost/handleImages";
+import { handleOptions } from "./handlePost/handleOptions";
 
 async function POST(req: any, res: any) {
   console.log("Request Body:", req.body);
@@ -11,10 +13,9 @@ async function POST(req: any, res: any) {
     stock = 0,
     description,
     price,
-    priceWithDiscount
+    priceWithDiscount,
+    category_ids
   }: Product = req.body;
-
-  const options = req.body.options;
 
   if (!name || !slug || !description || !price) {
     return res.status(400).json({
@@ -34,42 +35,18 @@ async function POST(req: any, res: any) {
         priceWithDiscount: Number(priceWithDiscount)
       }
     });
+    const category = await handleCategory(newProduct.id, category_ids);
 
-    const imagePaths = [];
-    if (req.files && req.files.image) { 
-      for (const file of req.files.image as Express.Multer.File[]) {
-        const imagePath = await saveImg(file);
-        const image = await prisma.productImage.create({
-          data: {
-            path: imagePath,
-            enabled: true,
-            productId: newProduct.id
-          }
-        });
-        imagePaths.push(image);
-      }
-    } else {
-      console.log("Nenhum arquivo enviado."); 
-    }
+    const imagePaths = await handleImages(req.files, newProduct.id);
 
-    const productOptions = JSON.parse(options);
-    for (const option of productOptions) {
-      await prisma.productOption.create({
-        data: {
-          title: option.title,
-          shape: option.shape.toUpperCase(),
-          radius: option.radius || 0,
-          type: option.type.toUpperCase(),
-          values: JSON.stringify(option.values),
-          productId: newProduct.id
-        }
-      });
-    }
+    const option = await handleOptions(req.body.options, newProduct.id);
 
     return res.status(201).json({
       message: "Produto criado com sucesso",
       product: newProduct,
-      images: imagePaths
+      imagePaths,
+      option,
+      category
     });
   } catch (error) {
     console.error("Erro ao criar produto:", error);

@@ -17,4 +17,5 @@ export interface Product {
   ProductImage: ProductImage[];
   ProductOption: ProductOption[];
   ProductCategory: ProductCategory[];
+  category_ids: string;
 }
