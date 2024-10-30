@@ -2,7 +2,11 @@ import prisma from "../../../../prisma/db";
 
 export async function handleCategory(productId: number, categoryIds: string) {
   try {
-
+    await prisma.productCategory.deleteMany({
+      where: {
+        productId: productId
+      }
+    });
     const categoryIdsArray = categoryIds
       .split(",")
       .map((id: string) => Number(id.trim()));

@@ -6,6 +6,12 @@ export async function handleImages(files: any, productId: number) {
 
   if (files && files.image) {
     try {
+
+      await prisma.productImage.deleteMany({
+        where: {
+          productId: productId,
+        },
+      });
       for (const file of files.image as Express.Multer.File[]) {
         const imagePath = await saveImg(file);
         const image = await prisma.productImage.create({

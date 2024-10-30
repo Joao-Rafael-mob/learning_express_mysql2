@@ -4,7 +4,15 @@ export async function handleOptions(options: any, productId: number) {
   const createdOptions = [];
 
   try {
+
+    
     const productOptions = JSON.parse(options);
+    
+    await prisma.productOption.deleteMany({
+      where: {
+        productId: productId,
+      },
+    });
 
     for (const option of productOptions) {
       const createdOption = await prisma.productOption.create({

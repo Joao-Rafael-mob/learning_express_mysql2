@@ -50,7 +50,7 @@ async function POST(req: any, res: any) {
     });
   } catch (error) {
     console.error("Erro ao criar produto:", error);
-    res.status(500).json({ message: "Erro ao cadastrar produto" });
+    res.status(500).json({ message: "Erro ao cadastrar produto", error });
   }
 }
 
