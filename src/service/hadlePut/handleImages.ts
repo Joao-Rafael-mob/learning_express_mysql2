@@ -1,5 +1,5 @@
-import prisma from "../../../../prisma/db";
-import { saveImg } from "../../../service/saveimg";
+import prisma from "../../../prisma/db";
+import { saveImg } from "../saveimg";
 
 export async function handleImages(files: any, productId: number) {
   const imagePaths = [];

@@ -1,8 +1,7 @@
 import prisma from "../../../prisma/db";
 
 async function GET(req: any, res: any) {
-  const  id  = parseInt(req.query.id, 10);
-
+  const id = parseInt(req.query.id, 10);
 
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid product ID" });
@@ -13,10 +12,34 @@ async function GET(req: any, res: any) {
         id
       },
       include: {
-        ProductCategory: true,
-        ProductImage: true,
-        ProductOption: true,
-      },
+        ProductCategory: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
+          }
+        },
+        ProductImage: {
+          select: {
+            id: true,
+            path: true
+          }
+        },
+        ProductOption: {
+          select: {
+            id: true,
+            productId: true,
+            title: true,
+            shape: true,
+            radius: true,
+            type: true,
+            values: true
+          }
+        }
+      }
     });
 
     if (!product) {

@@ -1,21 +1,21 @@
 import prisma from "../../../prisma/db";
 import { Product } from "../../modals/ProductModal";
-import { handleCategory } from "./handlePost/handleCategory";
-import { handleImages } from "./handlePost/handleImages";
-import { handleOptions } from "./handlePost/handleOptions";
+import { handleCategory } from "../../service/handlePost/handleCategory";
+import { handleImages } from "../../service/handlePost/handleImages";
+import { handleOptions } from "../../service/handlePost/handleOptions";
 
 async function POST(req: any, res: any) {
   console.log("Request Body:", req.body);
   const {
-    enabled = true,
+    enabled,
     name,
     slug,
-    stock = 0,
+    stock,
     description,
     price,
     priceWithDiscount,
     category_ids
-  }: Product = req.body;
+  } = req.body;
 
   if (!name || !slug || !description || !price) {
     return res.status(400).json({
@@ -29,7 +29,7 @@ async function POST(req: any, res: any) {
         enabled,
         name,
         slug,
-        stock,
+        stock: parseFloat(stock),
         description,
         price: Number(price),
         priceWithDiscount: Number(priceWithDiscount)

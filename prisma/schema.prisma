@@ -13,23 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  firstname String
-  surname   String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("users")
-}
-
 model Product {
   id                Int               @id @default(autoincrement())
   enabled           Boolean?          @default(false)
   name              String
-  slug              String         
+  slug              String
   useInMenu         Boolean?          @default(false)
   stock             Int?              @default(0)
   description       String?
@@ -40,14 +28,103 @@ model Product {
   ProductImage      ProductImage[]
   ProductOption     ProductOption[]
   ProductCategory   ProductCategory[]
+  OrderProduct      OrderProduct[]
 
   @@map("products")
+}
+
+model PaymentTransaction {
+  id              String           @id @default(uuid())
+  orderId         String
+  userId          Int
+  amount          Float
+  method          FormaDePagamento
+  status          PaymentStatus
+  transactionDate DateTime         @default(now())
+  details         String?
+  order           Order            @relation(fields: [orderId], references: [id])
+  user            User             @relation(fields: [userId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+model Order {
+  id                 String               @id @default(uuid())
+  userId             Int
+  user               User?                @relation(fields: [userId], references: [id])
+  orderDate          DateTime?
+  status             String?
+  orderProduct       OrderProduct[]
+  payments           pagamento[]
+  PaymentTransaction PaymentTransaction[]
+}
+
+model OrderProduct {
+  orderId   String
+  productId Int
+  quantity  Int?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+}
+
+model pagamento {
+  id               String           @id @default(uuid())
+  userId           Int?
+  method           FormaDePagamento
+  nomeDoCartao     String
+  numeroDoCartao   String
+  dataDeVecinmento DateTime
+  cvv              String
+  user             User?            @relation(fields: [userId], references: [id])
+  Order            Order?           @relation(fields: [orderId], references: [id])
+  orderId          String?
+}
+
+enum FormaDePagamento {
+  CREDITO
+  BOLETO
+}
+
+model User {
+  id                 Int                  @id @default(autoincrement())
+  firstname          String
+  surname            String
+  cpf                String?              @unique
+  email              String               @unique
+  celular            String?
+  password           String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  address            Address?
+  pagamento          pagamento[]
+  Order              Order[]
+  PaymentTransaction PaymentTransaction[]
+
+  @@map("users")
+}
+
+model Address {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @unique
+  user        User    @relation(fields: [userId], references: [id])
+  endereco    String?
+  bairro      String?
+  cidade      String?
+  cep         String?
+  complemento String?
 }
 
 model Category {
   id              Int               @id @default(autoincrement())
   name            String
-  slug            String           
+  slug            String
   useInMenu       Boolean?          @default(false)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -96,7 +173,7 @@ model ProductOption {
   @@map("product_options")
 }
 
-enum Shape {  
+enum Shape {
   SQUARE
   CIRCLE
 }

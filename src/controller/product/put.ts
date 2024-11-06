@@ -1,8 +1,8 @@
 import prisma from "../../../prisma/db";
 import { Product } from "../../modals/ProductModal";
-import { handleCategory } from "./hadlePut/handleCategory";
-import { handleImages } from "./hadlePut/handleImages";
-import { handleOptions } from "./hadlePut/handleOptions";
+import { handleCategory } from "../../service/hadlePut/handleCategory";
+import { handleImages } from "../../service/hadlePut/handleImages";
+import { handleOptions } from "../../service/hadlePut/handleOptions";
 
 async function PUT(req: any, res: any) {
   const {
